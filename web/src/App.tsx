@@ -8,6 +8,7 @@ import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
 
 import './index.css'
+import './scaffold.css'
 
 const extendedTheme = extendTheme(theme)
 

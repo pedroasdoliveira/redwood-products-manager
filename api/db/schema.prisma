@@ -9,11 +9,11 @@ generator client {
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  name String
-  brand String
-  price Float
-  image String
+  id        Int      @id @default(autoincrement())
+  name      String
+  brand     String
+  price     Float
+  image     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
