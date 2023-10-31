@@ -1,5 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Prisma } from '@prisma/client'
 import { db } from 'api/src/lib/db'
+
+type ProductsType = {
+  name: string
+  brand: string
+  price: number
+  image: string
+}
 
 export default async () => {
   try {
@@ -9,15 +17,44 @@ export default async () => {
     //
     // Update "const data = []" to match your data model and seeding needs
     //
-    const data: Prisma.UserExampleCreateArgs['data'][] = [
-      // To try this example data with the UserExample model in schema.prisma,
-      // uncomment the lines below and run 'yarn rw prisma migrate dev'
-      //
-      // { name: 'alice', email: 'alice@example.com' },
-      // { name: 'mark', email: 'mark@example.com' },
-      // { name: 'jackie', email: 'jackie@example.com' },
-      // { name: 'bob', email: 'bob@example.com' },
+    const products: ProductsType[] = [
+      {
+        name: 'Coca-cola 2L',
+        brand: 'Coca-cola',
+        price: 10.9,
+        image:
+          'https://files.passeidireto.com/1777ee32-579a-43f2-b69c-1487eb962bf6/1777ee32-579a-43f2-b69c-1487eb962bf6.png',
+      },
+      {
+        name: 'Guarana Antarctica 2L',
+        brand: 'AmBev',
+        price: 8.9,
+        image:
+          'https://choppbrahmaexpress.vtexassets.com/arquivos/ids/155720/guaran_2.png?v=637353454730230000',
+      },
+      {
+        name: 'Pepsi 2L',
+        brand: 'Pepsico Inc',
+        price: 9.9,
+        image:
+          'https://giassi.vtexassets.com/arquivos/ids/644048/Refrigerante-Cola-Pepsi-Garrafa-2l.png?v=638211560060330000',
+      },
+      {
+        name: 'Macarrão Penne',
+        brand: 'Barilla',
+        price: 10.9,
+        image:
+          'https://www.barilla.com//-/media/images/pt_br/products/cards/massa-com-ovos/novo/fb_aw_3d_11154_swwe_penne_500g_blu_v1.png?la=pt-BR',
+      },
+      {
+        name: 'Atum Ralado em óleo Enlatado',
+        brand: 'Gomes da Costa',
+        price: 8.7,
+        image:
+          'https://www.castelao.com.br/media/catalog/product/cache/1/image/600x392.53731343284/9df78eab33525d08d6e5fb8d27136e95/a/t/atum_ralado_gomes_lata_170.png',
+      },
     ]
+
     console.log(
       "\nUsing the default './scripts/seed.{js,ts}' template\nEdit the file to add seed data\n"
     )
@@ -25,37 +62,12 @@ export default async () => {
     // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
     // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
     await Promise.all(
-      //
-      // Change to match your data model and seeding needs
-      //
-      data.map(async (data: Prisma.UserExampleCreateArgs['data']) => {
-        const record = await db.userExample.create({ data })
+      products.map(async (data: ProductsType) => {
+        const record = await db.product.createMany({ data })
+
         console.log(record)
       })
     )
-
-    // If using dbAuth and seeding users, you'll need to add a `hashedPassword`
-    // and associated `salt` to their record. Here's how to create them using
-    // the same algorithm that dbAuth uses internally:
-    //
-    //   import { hashPassword } from '@redwoodjs/auth-dbauth-api'
-    //
-    //   const users = [
-    //     { name: 'john', email: 'john@example.com', password: 'secret1' },
-    //     { name: 'jane', email: 'jane@example.com', password: 'secret2' }
-    //   ]
-    //
-    //   for (const user of users) {
-    //     const [hashedPassword, salt] = hashPassword(user.password)
-    //     await db.user.create({
-    //       data: {
-    //         name: user.name,
-    //         email: user.email,
-    //         hashedPassword,
-    //         salt
-    //       }
-    //     })
-    //   }
   } catch (error) {
     console.warn('Please define your seed data.')
     console.error(error)
