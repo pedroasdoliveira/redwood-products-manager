@@ -1,13 +1,21 @@
-import {
-  Form,
-  FormError,
-  FieldError,
-  Label,
-  TextField,
-  Submit,
-} from '@redwoodjs/forms'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import './style.css'
 
+import { useState } from 'react'
+
+import {
+  FormControl,
+  Stack,
+  Input,
+  FormHelperText,
+  Box,
+  Flex,
+} from '@chakra-ui/react'
+import { toast } from 'react-toastify'
 import type { EditProductById, UpdateProductInput } from 'types/graphql'
+import * as Yup from 'yup'
+
+import { Form, FormError, FieldError, Submit } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 
 type FormProduct = NonNullable<EditProductById['product']>
@@ -19,100 +27,181 @@ interface ProductFormProps {
   loading: boolean
 }
 
+type ProductType = {
+  name: string
+  brand: string
+  price: number
+  image: string
+}
+
 const ProductForm = (props: ProductFormProps) => {
-  const onSubmit = (data: FormProduct) => {
-    props.onSave(data, props?.product?.id)
+  const [product, setProduct] = useState<ProductType>({
+    name: '',
+    brand: '',
+    price: 0,
+    image: '',
+  })
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required('O nome do produto é obrigatorio!'),
+    brand: Yup.string().required('Coloque o nome da marca do produto!'),
+    price: Yup.number().required('Coloque o valor do produto!'),
+    image: Yup.string().required('Coloque uma image do produto!'),
+  })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    const { name, value } = e.target
+
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: value,
+    }))
+  }
+
+  const onSubmit = async () => {
+    try {
+      if (typeof product.price === 'string') {
+        const priceFloat = parseFloat(product.price)
+
+        product.price = priceFloat
+      }
+      console.log(product)
+
+      await validationSchema.validate(product, { abortEarly: false })
+
+      props.onSave(product, props?.product?.id)
+    } catch (error) {
+      // toast.error(
+      //   `Erro ao cadastrar informações do formulario: ${error.message}`,
+      //   {
+      //     position: 'top-right',
+      //     autoClose: 5000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //   }
+      // )
+      alert(`Erro ao cadastrar informações do formulario: ${error.message}`)
+      console.error(error)
+    }
   }
 
   return (
-    <div className="rw-form-wrapper">
-      <Form<FormProduct> onSubmit={onSubmit} error={props.error}>
-        <FormError
+    <Flex
+      as="div"
+      w="80%"
+      flexDirection={'column'}
+      alignItems={'center'}
+      justifyContent={'center'}
+      gap={'2rem'}
+    >
+      <Box
+        as="div"
+        w={'100%'}
+        p={'8'}
+        bg={'teal.800'}
+        style={{ border: '1px solid transparent', borderRadius: '15px' }}
+      >
+        <Form<FormProduct>
+          onSubmit={onSubmit}
           error={props.error}
-          wrapperClassName="rw-form-error-wrapper"
-          titleClassName="rw-form-error-title"
-          listClassName="rw-form-error-list"
-        />
-
-        <Label
-          name="name"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
+          style={{ width: '100%' }}
         >
-          Name
-        </Label>
+          <FormError
+            error={props.error}
+            wrapperClassName="rw-form-error-wrapper"
+            titleClassName="rw-form-error-title"
+            listClassName="rw-form-error-list"
+          />
 
-        <TextField
-          name="name"
-          defaultValue={props.product?.name}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
+          <FormControl isRequired>
+            <Stack gap={'2rem'}>
+              <Input
+                type="text"
+                name="name"
+                placeholder="Nome do produto*"
+                bg={'whiteAlpha.900'}
+                color={'black'}
+                value={
+                  typeof props.product !== 'undefined'
+                    ? props.product.name
+                    : product.name
+                }
+                onChange={handleChange}
+              />
+              <FieldError name="name" className="rw-field-error" />
 
-        <FieldError name="name" className="rw-field-error" />
+              <Input
+                type="text"
+                name="brand"
+                placeholder="Marca do produto*"
+                bg={'whiteAlpha.900'}
+                color={'black'}
+                value={
+                  typeof props.product !== 'undefined'
+                    ? props.product.brand
+                    : product.brand
+                }
+                onChange={handleChange}
+              />
+              <FieldError name="brand" className="rw-field-error" />
 
-        <Label
-          name="brand"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Brand
-        </Label>
+              <Box>
+                <Input
+                  type="text"
+                  name="price"
+                  placeholder="Valor do produto*"
+                  bg={'whiteAlpha.900'}
+                  color={'black'}
+                  value={
+                    typeof props.product !== 'undefined'
+                      ? props.product.price
+                      : product.price
+                  }
+                  onChange={handleChange}
+                />
+                <FormHelperText color={'black'} fontWeight={'bold'}>
+                  Ex: 10.90
+                </FormHelperText>
 
-        <TextField
-          name="brand"
-          defaultValue={props.product?.brand}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
+                <FieldError name="price" className="rw-field-error" />
+              </Box>
 
-        <FieldError name="brand" className="rw-field-error" />
+              <Box>
+                <Input
+                  type="text"
+                  name="image"
+                  placeholder="Link da image do produto produto*"
+                  bg={'whiteAlpha.900'}
+                  color={'black'}
+                  value={
+                    typeof props.product !== 'undefined'
+                      ? props.product.image
+                      : product.image
+                  }
+                  onChange={handleChange}
+                />
+                <FormHelperText color={'black'} fontWeight={'bold'}>
+                  Utilize o link de uma imagem salva ou do google (preferencia
+                  PNG).
+                </FormHelperText>
 
-        <Label
-          name="price"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Price
-        </Label>
+                <FieldError name="image" className="rw-field-error" />
+              </Box>
+            </Stack>
+          </FormControl>
 
-        <TextField
-          name="price"
-          defaultValue={props.product?.price}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ valueAsNumber: true, required: true }}
-        />
-
-        <FieldError name="price" className="rw-field-error" />
-
-        <Label
-          name="image"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Image
-        </Label>
-
-        <TextField
-          name="image"
-          defaultValue={props.product?.image}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="image" className="rw-field-error" />
-
-        <div className="rw-button-group">
-          <Submit disabled={props.loading} className="rw-button rw-button-blue">
-            Save
-          </Submit>
-        </div>
-      </Form>
-    </div>
+          <Box className="rw-button-group">
+            <Submit
+              disabled={props.loading}
+              className="rw-button rw-button-blue submit_btn"
+            >
+              Cadastrar
+            </Submit>
+          </Box>
+        </Form>
+      </Box>
+    </Flex>
   )
 }
 
