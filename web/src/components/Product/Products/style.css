@@ -1,0 +1,20 @@
+.grid_item {
+  border: 1px solid transparent;
+  box-shadow: 0px 0px 5px 5px #ffffff60;
+
+  cursor: pointer;
+  transition: all 0.6s ease-in-out;
+}
+
+.grid_item:hover {
+  transform: scale(1.1);
+}
+
+.product_img {
+  max-width: 115px;
+  min-width: 115px;
+  min-height: 180px;
+  max-height: 180px;
+
+  margin: 2rem 0;
+}
