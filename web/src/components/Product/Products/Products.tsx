@@ -1,19 +1,33 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import './style.css';
+import './style.css'
 
-import { SearchIcon, SmallAddIcon } from '@chakra-ui/icons';
-import { Box, Center, Container, Flex, Grid, GridItem, Heading, IconButton, Input, Stack, Text } from '@chakra-ui/react';
+import { useState } from 'react'
+
+import { SearchIcon, SmallAddIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  IconButton,
+  Input,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
 import type {
   DeleteProductMutationVariables,
   FindProducts,
 } from 'types/graphql'
 
-import { Link, routes } from '@redwoodjs/router';
-import { useMutation } from '@redwoodjs/web';
-import { toast } from '@redwoodjs/web/dist/toast';
+import { Link, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/dist/toast'
 
-import { QUERY } from '../EditProductCell';
+import { QUERY } from '../EditProductCell'
 
 const DELETE_PRODUCT_MUTATION = gql`
   mutation DeleteProductMutation($id: Int!) {
@@ -24,6 +38,12 @@ const DELETE_PRODUCT_MUTATION = gql`
 `
 
 const ProductsList = ({ products }: FindProducts) => {
+  const [search, setSearch] = useState<string>('')
+  const [searchProduct, setSearchProduct] = useState<string>('')
+
+  const handleSearch = () => {
+    setSearchProduct(search)
+  }
 
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION, {
     onCompleted: () => {
@@ -76,12 +96,15 @@ const ProductsList = ({ products }: FindProducts) => {
             placeholder="Pesquisar o nome do produto..."
             bg={'whiteAlpha.800'}
             color={'blackAlpha.900'}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
 
           <IconButton
             aria-label="Search database"
             icon={<SearchIcon />}
             colorScheme="gray"
+            onClick={handleSearch}
           />
         </Box>
 
@@ -99,52 +122,64 @@ const ProductsList = ({ products }: FindProducts) => {
             p={'6'}
             gap={10}
           >
-            {products.map((product) => (
-              <GridItem
-                key={product.id}
-                w={'100%'}
-                minH={'415px'}
-                p={'4'}
-                textAlign={'center'}
-                bg={'whiteAlpha.900'}
-                borderRadius={'10px'}
-                className="grid_item"
-              >
-                <Box
+            {products
+              .filter((product) => {
+                if (searchProduct === '') {
+                  return product
+                } else if (
+                  product.name
+                    .toLowerCase()
+                    .includes(searchProduct.toLowerCase())
+                ) {
+                  return product
+                }
+              })
+              .map((product) => (
+                <GridItem
+                  key={product.id}
                   w={'100%'}
-                  display={'flex'}
-                  flexDirection={'column'}
-                  justifyContent={'center'}
-                  alignItems={'center'}
-                  className="box_product"
+                  minH={'415px'}
+                  p={'4'}
+                  textAlign={'center'}
+                  bg={'whiteAlpha.900'}
+                  borderRadius={'10px'}
+                  className="grid_item"
                 >
-                  <Heading
-                    as="h3"
-                    fontSize={'1.4rem'}
-                    fontWeight={'bold'}
-                    textAlign={'center'}
+                  <Box
+                    w={'100%'}
+                    display={'flex'}
+                    flexDirection={'column'}
+                    justifyContent={'center'}
+                    alignItems={'center'}
+                    className="box_product"
                   >
-                    {product.name}
-                  </Heading>
+                    <Heading
+                      as="h3"
+                      fontSize={'1.4rem'}
+                      fontWeight={'bold'}
+                      textAlign={'center'}
+                    >
+                      {product.name}
+                    </Heading>
 
-                  <img
-                    src={product.image}
-                    alt={`Produto ${product.name}`}
-                    className="product_img"
-                  />
+                    <img
+                      src={product.image}
+                      alt={`Produto ${product.name}`}
+                      className="product_img"
+                    />
 
-                  <Stack gap={'1rem'}>
-                    <Text fontSize={'1.2rem'} textAlign={'center'}>
-                      Marca: <strong>{product.brand}</strong>
-                    </Text>
+                    <Stack gap={'1rem'}>
+                      <Text fontSize={'1.2rem'} textAlign={'center'}>
+                        Marca: <strong>{product.brand}</strong>
+                      </Text>
 
-                    <Text fontSize={'1.2rem'} textAlign={'center'}>
-                      Preço: R$ <strong>{product.price}</strong>
-                    </Text>
-                  </Stack>
-                </Box>
-              </GridItem>
-            ))}
+                      <Text fontSize={'1.2rem'} textAlign={'center'}>
+                        Preço: R$ <strong>{product.price}</strong>
+                      </Text>
+                    </Stack>
+                  </Box>
+                </GridItem>
+              ))}
           </Grid>
         </Center>
 
