@@ -45,7 +45,9 @@ const ProductForm = (props: ProductFormProps) => {
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('O nome do produto é obrigatorio!'),
     brand: Yup.string().required('Coloque o nome da marca do produto!'),
-    price: Yup.number().required('Coloque o valor do produto!'),
+    price: Yup.number()
+      .required('Coloque o valor do produto!')
+      .moreThan(0, 'O preço do ser maior do que zero!'),
     image: Yup.string().required('Coloque uma image do produto!'),
   })
 
