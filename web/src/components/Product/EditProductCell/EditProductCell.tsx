@@ -1,6 +1,15 @@
+import { ArrowBackIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Heading,
+  IconButton,
+} from '@chakra-ui/react'
 import type { EditProductById, UpdateProductInput } from 'types/graphql'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { Link, navigate, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
@@ -62,20 +71,53 @@ export const Success = ({ product }: CellSuccessProps<EditProductById>) => {
   }
 
   return (
-    <div className="rw-segment">
-      <header className="rw-segment-header">
-        <h2 className="rw-heading rw-heading-secondary">
-          Edit Product {product?.id}
-        </h2>
-      </header>
-      <div className="rw-segment-main">
-        <ProductForm
-          product={product}
-          onSave={onSave}
-          error={error}
-          loading={loading}
-        />
-      </div>
-    </div>
+    <Container
+      as="main"
+      maxW={'100%'}
+      h={'100%'}
+      px={'8'}
+      py={'12'}
+      style={{ backgroundColor: '#212529' }}
+    >
+      <Box as="div" w={'100%'} marginBottom={'1rem'}>
+        <Link to={routes.products()}>
+          <IconButton
+            isRound={true}
+            variant="solid"
+            colorScheme="gray"
+            aria-label="Create"
+            fontSize="1.5rem"
+            w={'40px'}
+            h={'40px'}
+            icon={<ArrowBackIcon />}
+          />
+        </Link>
+      </Box>
+
+      <Flex
+        as="section"
+        width={'100%'}
+        h={'auto'}
+        flexDirection={'column'}
+        alignItems={'center'}
+        justifyContent={'center'}
+        gap={'3rem'}
+      >
+        <Center w={'100%'}>
+          <Heading as="h2" size={'lg'} fontWeight={'bold'} color={'white'}>
+            Editar o Produto {product.name}
+          </Heading>
+        </Center>
+
+        <Center w={'100%'}>
+          <ProductForm
+            product={product}
+            onSave={onSave}
+            error={error}
+            loading={loading}
+          />
+        </Center>
+      </Flex>
+    </Container>
   )
 }

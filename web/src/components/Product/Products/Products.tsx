@@ -23,7 +23,7 @@ import type {
   FindProducts,
 } from 'types/graphql'
 
-import { Link, routes } from '@redwoodjs/router'
+import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/dist/toast'
 
@@ -43,6 +43,10 @@ const ProductsList = ({ products }: FindProducts) => {
 
   const handleSearch = () => {
     setSearchProduct(search)
+  }
+
+  const navigateProduct = (id: number) => {
+      navigate(routes.product({id}), {replace: true})
   }
 
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION, {
@@ -109,7 +113,7 @@ const ProductsList = ({ products }: FindProducts) => {
         </Box>
 
         <Center width={'100%'} h={'auto'}>
-          <Heading as="h2" color={'white'} cursor={'default'}>
+          <Heading as="h2" color={'white'} fontWeight={"bold"} cursor={'default'}>
             {products.length} produtos disponíveis
           </Heading>
         </Center>
@@ -144,6 +148,7 @@ const ProductsList = ({ products }: FindProducts) => {
                   bg={'whiteAlpha.900'}
                   borderRadius={'10px'}
                   className="grid_item"
+                  onClick={() => navigateProduct(product.id)}
                 >
                   <Box
                     w={'100%'}
@@ -151,7 +156,6 @@ const ProductsList = ({ products }: FindProducts) => {
                     flexDirection={'column'}
                     justifyContent={'center'}
                     alignItems={'center'}
-                    className="box_product"
                   >
                     <Heading
                       as="h3"
