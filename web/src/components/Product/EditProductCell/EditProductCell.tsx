@@ -1,20 +1,13 @@
-import { ArrowBackIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Center,
-  Container,
-  Flex,
-  Heading,
-  IconButton,
-} from '@chakra-ui/react'
+import { Center, Container, Flex, Heading } from '@chakra-ui/react'
 import type { EditProductById, UpdateProductInput } from 'types/graphql'
 
-import { Link, navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
 import ProductForm from 'src/components/Product/ProductForm'
+import ReturnPage from 'src/components/returnPage'
 
 export const QUERY = gql`
   query EditProductById($id: Int!) {
@@ -43,7 +36,7 @@ const UPDATE_PRODUCT_MUTATION = gql`
   }
 `
 
-export const Loading = () => <div>Loading...</div>
+export const Loading = () => <div>Carregando...</div>
 
 export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
@@ -79,20 +72,7 @@ export const Success = ({ product }: CellSuccessProps<EditProductById>) => {
       py={'12'}
       style={{ backgroundColor: '#212529' }}
     >
-      <Box as="div" w={'100%'} marginBottom={'1rem'}>
-        <Link to={routes.products()}>
-          <IconButton
-            isRound={true}
-            variant="solid"
-            colorScheme="gray"
-            aria-label="Create"
-            fontSize="1.5rem"
-            w={'40px'}
-            h={'40px'}
-            icon={<ArrowBackIcon />}
-          />
-        </Link>
-      </Box>
+      <ReturnPage />
 
       <Flex
         as="section"
