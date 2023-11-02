@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import './style.css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   FormControl,
@@ -11,7 +12,6 @@ import {
   Box,
   Flex,
 } from '@chakra-ui/react'
-import { toast } from 'react-toastify'
 import type { EditProductById, UpdateProductInput } from 'types/graphql'
 import * as Yup from 'yup'
 
@@ -45,7 +45,9 @@ const ProductForm = (props: ProductFormProps) => {
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('O nome do produto é obrigatorio!'),
     brand: Yup.string().required('Coloque o nome da marca do produto!'),
-    price: Yup.number().required('Coloque o valor do produto!'),
+    price: Yup.number()
+      .required('Coloque o valor do produto!')
+      .moreThan(0, 'O preço do ser maior do que zero!'),
     image: Yup.string().required('Coloque uma image do produto!'),
   })
 
@@ -59,6 +61,24 @@ const ProductForm = (props: ProductFormProps) => {
     }))
   }
 
+  useEffect(() => {
+    if (typeof props.product !== 'undefined') {
+      setProduct({
+        name: props.product.name,
+        brand: props.product.brand,
+        price: props.product.price,
+        image: props.product.image,
+      })
+    } else {
+      setProduct({
+        name: '',
+        brand: '',
+        price: 0,
+        image: '',
+      })
+    }
+  }, [props.product])
+
   const onSubmit = async () => {
     try {
       if (typeof product.price === 'string') {
@@ -70,17 +90,13 @@ const ProductForm = (props: ProductFormProps) => {
 
       await validationSchema.validate(product, { abortEarly: false })
 
-      props.onSave(product, props?.product?.id)
+      if (typeof props.product !== 'undefined') {
+        // Para atualizar
+        props.onSave(product, props.product.id)
+      }
+
+      props.onSave(product, props?.product?.id) // Para criar
     } catch (error) {
-      // toast.error(
-      //   `Erro ao cadastrar informações do formulario: ${error.message}`,
-      //   {
-      //     position: 'top-right',
-      //     autoClose: 5000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //   }
-      // )
       alert(`Erro ao cadastrar informações do formulario: ${error.message}`)
       console.error(error)
     }
@@ -122,11 +138,7 @@ const ProductForm = (props: ProductFormProps) => {
                 placeholder="Nome do produto*"
                 bg={'whiteAlpha.900'}
                 color={'black'}
-                value={
-                  typeof props.product !== 'undefined'
-                    ? props.product.name
-                    : product.name
-                }
+                value={product.name}
                 onChange={handleChange}
               />
               <FieldError name="name" className="rw-field-error" />
@@ -137,11 +149,7 @@ const ProductForm = (props: ProductFormProps) => {
                 placeholder="Marca do produto*"
                 bg={'whiteAlpha.900'}
                 color={'black'}
-                value={
-                  typeof props.product !== 'undefined'
-                    ? props.product.brand
-                    : product.brand
-                }
+                value={product.brand}
                 onChange={handleChange}
               />
               <FieldError name="brand" className="rw-field-error" />
@@ -153,11 +161,7 @@ const ProductForm = (props: ProductFormProps) => {
                   placeholder="Valor do produto*"
                   bg={'whiteAlpha.900'}
                   color={'black'}
-                  value={
-                    typeof props.product !== 'undefined'
-                      ? props.product.price
-                      : product.price
-                  }
+                  value={product.price}
                   onChange={handleChange}
                 />
                 <FormHelperText color={'black'} fontWeight={'bold'}>
@@ -174,11 +178,7 @@ const ProductForm = (props: ProductFormProps) => {
                   placeholder="Link da image do produto produto*"
                   bg={'whiteAlpha.900'}
                   color={'black'}
-                  value={
-                    typeof props.product !== 'undefined'
-                      ? props.product.image
-                      : product.image
-                  }
+                  value={product.image}
                   onChange={handleChange}
                 />
                 <FormHelperText color={'black'} fontWeight={'bold'}>
@@ -196,7 +196,7 @@ const ProductForm = (props: ProductFormProps) => {
               disabled={props.loading}
               className="rw-button rw-button-blue submit_btn"
             >
-              Cadastrar
+              {typeof props.product !== 'undefined' ? 'Atualizar' : 'Cadastrar'}
             </Submit>
           </Box>
         </Form>
